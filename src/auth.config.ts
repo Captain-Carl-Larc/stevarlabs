@@ -72,6 +72,16 @@ export const authConfig = {
         session.user.status = token.status as any;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // If the user just logged in from the default page, send them to admin
+      if (url.includes("/login")) {
+        return `${baseUrl}/admin`;
+      }
+      // Otherwise, allow standard NextAuth redirect behavior
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     }
   },
   pages: {
