@@ -16,7 +16,8 @@ export async function loginAction(formData: FormData) {
         case "CredentialsSignin":
           return { error: "Invalid email or password." };
         default:
-          return { error: "An authentication error occurred." };
+          //return { error: "An authentication error occurred." };
+          return { error: `Debug: ${error.message}` };
       }
     }
     // Next.js uses errors to trigger redirects. We MUST re-throw it if it's not an AuthError.
