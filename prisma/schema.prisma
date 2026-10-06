@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- ENUMS ---
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  EDITOR
+  REVIEWER
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  DEACTIVATED
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// --- MODELS ---
+
+model User {
+  id              String     @id @default(cuid())
+  name            String
+  email           String     @unique
+  passwordHash    String?
+  role            Role
+  status          UserStatus @default(PENDING)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  tokens       InviteToken[]
+  posts        Post[]
+  activityLogs ActivityLog[]
+
+  @@map("users")
+}
+
+model InviteToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime // Enforced 48-hour validity in code
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([tokenHash])
+  @@map("invite_tokens")
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Post {
+  id      String     @id @default(cuid())
+  title   String
+  slug    String     @unique
+  content String     @db.Text // Tiptap JSON stringified
+  status  PostStatus @default(DRAFT)
+
+  // SEO Fields
+  metaTitle       String?
+  metaDescription String? @db.Text
+  canonicalUrl    String?
+  featuredImage   String?
+  imageAltText    String?
+  noIndex         Boolean @default(false)
+
+  // AEO & GEO Structural Blocks (Stored as JSONB in Postgres)
+  summary    String? @db.Text
+  faqs       Json? // Expected shape: Array of { question: string, answer: string }
+  quickFacts Json? // Expected shape: Array of { label: string, value: string }
+
+  // Relationships
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  // Link Graph tracking (for Reviewer API & internal linking tools)
+  outgoingLinks PostLink[] @relation("SourceLinks")
+  incomingLinks PostLink[] @relation("TargetLinks")
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([categoryId])
+  @@map("posts")
+}
+
+model PostLink {
+  id           String  @id @default(cuid())
+  sourcePostId String
+  targetUrl    String
+  targetPostId String?
+
+  sourcePost Post  @relation("SourceLinks", fields: [sourcePostId], references: [id], onDelete: Cascade)
+  targetPost Post? @relation("TargetLinks", fields: [targetPostId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([sourcePostId])
+  @@index([targetPostId])
+  @@map("post_links")
+}
+
+model ActivityLog {
+  id      String @id @default(cuid())
+  action  String
+  details Json?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@map("activity_logs")
+}
