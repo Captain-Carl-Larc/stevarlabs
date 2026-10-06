@@ -65,6 +65,16 @@ model InviteToken {
   @@map("invite_tokens")
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, token])
+}
+
 model Category {
   id          String  @id @default(cuid())
   name        String
