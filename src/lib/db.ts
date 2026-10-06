@@ -14,6 +14,8 @@ function createPrismaClient() {
   // 1. Create a standard Postgres connection pool
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl:true,
+    connectionTimeoutMillis:5000,
   });
 
   // 2. Wrap it in the Prisma Adapter

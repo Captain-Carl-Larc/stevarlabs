@@ -24,6 +24,7 @@ export async function bootstrapSuperadmin(formData: FormData) {
   }
 
   try {
+    const passwordHash = await bcrypt.hash(password, 12);
     // 2. Transaction prevents race conditions if two people submit exactly at once
     const user = await db.$transaction(async (tx) => {
       const userCount = await tx.user.count();
@@ -33,7 +34,7 @@ export async function bootstrapSuperadmin(formData: FormData) {
         return null;
       }
 
-      const passwordHash = await bcrypt.hash(password, 12);
+
 
       // Create the superadmin
       return await tx.user.create({
