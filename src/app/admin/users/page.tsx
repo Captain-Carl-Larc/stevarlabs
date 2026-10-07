@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { Role } from "@/generated/prisma";
 import { redirect } from "next/navigation";
-import { InviteUserForm } from "./components/invite-form";
+import { InviteUserForm } from "@/modules/users/components/invite-user";
 
 export default async function AdminUsersPage() {
   const session = await auth();
