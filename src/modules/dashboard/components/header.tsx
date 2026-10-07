@@ -2,40 +2,67 @@
 
 // File: header.tsx
 // Folder: src/modules/dashboard/components
-// Description: Top navigation bar containing mobile menu toggle, desktop sidebar collapse toggle, and user profile actions.
 
-import { Menu, PanelLeftClose, PanelLeftOpen, UserCircle } from "lucide-react";
+type UserProps = {
+  name: string | null;
+  email: string | null;
+  role: string;
+};
 
 interface HeaderProps {
+  user: UserProps;
   isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
-  setMobileOpen: (open: boolean) => void;
+  setIsCollapsed: (value: boolean) => void;
+  setMobileOpen: (value: boolean) => void;
 }
 
-export function Header({ isCollapsed, setIsCollapsed, setMobileOpen }: HeaderProps) {
+export function Header({ user, isCollapsed, setIsCollapsed, setMobileOpen }: HeaderProps) {
+  // Get user initials for the avatar (e.g., "Stephen Kalwenzi" -> "SK")
+  const getInitials = (name: string | null) => {
+    if (!name) return "U";
+    return name.split(" ").map((n) => n[0]).join("").substring(0, 2).toUpperCase();
+  };
+
   return (
-    <header className="flex flex-shrink-0 justify-between items-center bg-white dark:bg-slate-950 px-4 border-slate-200 dark:border-slate-800 border-b h-16">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm dark:border-slate-800 dark:bg-slate-950 md:px-6">
+      
+      {/* Left Side: Your existing toggle buttons */}
       <div className="flex items-center gap-4">
-        <button
+        {/* Mobile Hamburger Menu */}
+        <button 
           onClick={() => setMobileOpen(true)}
-          className="md:hidden text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 dark:text-slate-400"
+          className="md:hidden p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
         >
-          <Menu className="w-6 h-6" />
+          <svg className="w-6 h-6 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
         </button>
 
-        <button
+        {/* Desktop Collapse Toggle */}
+        <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:block text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 dark:text-slate-400"
+          className="hidden md:block p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
         >
-          {isCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+          <svg className="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isCollapsed ? "M4 6h16M4 12h16M4 18h16" : "M4 6h16M4 12h8m-8 6h16"} />
+          </svg>
         </button>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300 text-sm">
-          <UserCircle className="w-8 h-8 text-slate-400" />
-          <span className="hidden sm:block">Admin</span>
-        </button>
+      {/* Right Side: Static User Profile Display */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-sm">
+          {getInitials(user.name)}
+        </div>
+        
+        <div className="hidden flex-col items-start md:flex">
+          <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            {user.name}
+          </span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {user.role}
+          </span>
+        </div>
       </div>
     </header>
   );

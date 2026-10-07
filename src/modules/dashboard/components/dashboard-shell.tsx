@@ -2,13 +2,18 @@
 
 // File: dashboard-shell.tsx
 // Folder: src/modules/dashboard/components
-// Description: Master layout wrapper that coordinates state between the Header and Sidebar, providing the main content area.
 
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+type UserProps = {
+  name: string | null;
+  email: string | null;
+  role: string;
+};
+
+export function DashboardShell({ children, user }: { children: React.ReactNode, user: UserProps }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -22,6 +27,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-col flex-1 min-w-0">
         <Header
+          user={user} // <-- Pass the user data here
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
           setMobileOpen={setIsMobileOpen}

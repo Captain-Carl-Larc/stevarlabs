@@ -1,12 +1,9 @@
 // File: layout.tsx
 // Folder: src/app/admin
-// Description: Global layout wrapper for the admin dashboard, injecting the header and checking auth.
-// Imports: React, auth session, AdminHeader component, redirect.
-// Exports: Default AdminLayout component.
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { AdminHeader } from "@/modules/dashboard/components/AdminHeader";
+import { DashboardShell } from "@/modules/dashboard/components/dashboard-shell";
 
 export default async function AdminLayout({
   children,
@@ -20,18 +17,14 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen">
-      <AdminHeader 
-        user={{
-          name: session.user.name ?? "User",
-          email: session.user.email ?? "",
-          role: session.user.role,
-        }} 
-      />
-      
-      <main>
-        {children}
-      </main>
-    </div>
+    <DashboardShell 
+      user={{
+        name: session.user.name ?? "User",
+        email: session.user.email ?? "",
+        role: session.user.role,
+      }}
+    >
+      {children}
+    </DashboardShell>
   );
 }
