@@ -2,7 +2,7 @@
 // Folder: src/app/admin/categories
 // Description: Server Component that fetches categories and renders the Category Management page.
 
-import { getCategoriesAction } from "@/modules/categories/category.actions";
+import { getCategoriesAction } from "@/modules/categories/get-categories.action";
 import { CategoryTable } from "@/modules/categories/components/CategoryTable";
 
 export default async function CategoriesPage() {
