@@ -2,8 +2,11 @@
 
 // File: sidebar.tsx
 // Folder: src/modules/dashboard/components
-// Description: Handles the main navigation sidebar, including desktop collapsing and mobile flyout behavior.
+// Description: Handles the main navigation sidebar, including desktop collapsing, mobile flyout behavior, and the logout confirmation flow.
+// Imports: React hooks, Next.js routing, Lucide icons, and the logout Server Action.
+// Exports: Sidebar component
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -13,8 +16,10 @@ import {
   Tags, 
   Settings, 
   LogOut, 
-  X
+  X,
+  AlertCircle
 } from "lucide-react";
+import { logoutAction } from "@/modules/auth/logout.action";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -24,6 +29,10 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, isMobileOpen, setMobileOpen }: SidebarProps) {
   const pathname = usePathname();
+  
+  // Modal state
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navLinks = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -58,8 +67,14 @@ export function Sidebar({ isCollapsed, isMobileOpen, setMobileOpen }: SidebarPro
     );
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logoutAction();
+  };
+
   return (
     <>
+      {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div 
           className="md:hidden z-40 fixed inset-0 bg-slate-900/50"
@@ -67,6 +82,42 @@ export function Sidebar({ isCollapsed, isMobileOpen, setMobileOpen }: SidebarPro
         />
       )}
 
+      {/* Logout Confirmation Modal */}
+      {isLogoutModalOpen && (
+        <div className="z-[100] fixed inset-0 flex justify-center items-center bg-slate-900/50 backdrop-blur-sm p-4 transition-opacity">
+          <div className="bg-white dark:bg-slate-950 shadow-xl p-6 dark:border dark:border-slate-800 rounded-xl w-full max-w-md">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-shrink-0 justify-center items-center bg-red-100 dark:bg-red-900/30 rounded-full w-10 h-10">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="font-semibold text-slate-900 dark:text-white text-lg">Confirm Logout</h3>
+            </div>
+            
+            <p className="mt-3 text-slate-500 dark:text-slate-400 text-sm">
+              Are you sure you want to securely log out of the CyLoad CMS dashboard? You will need to sign back in to manage your content.
+            </p>
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                disabled={isLoggingOut}
+                className="hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="bg-red-600 hover:bg-red-500 disabled:opacity-50 px-4 py-2 rounded-lg font-semibold text-white text-sm transition"
+              >
+                {isLoggingOut ? "Logging out..." : "Log Out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar Container */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-slate-200 bg-white transition-all duration-300 dark:border-slate-800 dark:bg-slate-950 md:static ${
           isCollapsed ? "w-20" : "w-64"
@@ -96,7 +147,11 @@ export function Sidebar({ isCollapsed, isMobileOpen, setMobileOpen }: SidebarPro
           {bottomLinks.map((link) => (
             <NavItem key={link.name} link={link} />
           ))}
-          <button className="flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg w-full text-red-600 dark:text-red-400 transition-all">
+          {/* Replaced anchor tag with a button that triggers the modal */}
+          <button 
+            onClick={() => setIsLogoutModalOpen(true)}
+            className="flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg w-full text-red-600 dark:text-red-400 transition-all"
+          >
             <LogOut className="flex-shrink-0 w-5 h-5" />
             <span className={`text-sm font-medium ${isCollapsed ? "hidden md:hidden" : "block"}`}>
               Log Out
