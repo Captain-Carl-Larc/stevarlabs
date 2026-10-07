@@ -2,12 +2,16 @@
 
 // File: page.tsx
 // Folder: src/app/(public)/reset-password
+// Description: Password reset confirmation page where users set their new password.
+// Imports: Suspense from react, useRouter/useSearchParams from next/navigation, confirmPasswordReset action.
+// Exports: Default ResetPasswordPage component
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { confirmPasswordReset } from "@/modules/auth/password-reset.action";
 
-export default function ResetPasswordPage() {
+// 1. Extract the logic that reads URL parameters into an inner component
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -79,5 +83,14 @@ export default function ResetPasswordPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+// 2. Wrap the inner component in Suspense in the main page export
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="mt-24 text-slate-500 text-sm text-center">Loading secure form...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
