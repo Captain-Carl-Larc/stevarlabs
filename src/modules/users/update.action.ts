@@ -17,7 +17,12 @@ export async function updateUserAction(userId: string, data: { role?: Role; stat
     return { error: "Unauthorized action." };
   }
 
-  // Security Check: Prevent a regular ADMIN from modifying a SUPERADMIN
+  // Security Check 1: Prevent modifying your own role or status
+  if (userId === session.user.id) {
+    return { error: "You cannot change your own role or status from this panel." };
+  }
+
+  // Security Check 2: Prevent a regular ADMIN from modifying a SUPERADMIN
   if (session.user.role === Role.ADMIN) {
     const targetUser = await db.user.findUnique({ where: { id: userId } });
     if (targetUser?.role === Role.SUPERADMIN) {
@@ -31,9 +36,7 @@ export async function updateUserAction(userId: string, data: { role?: Role; stat
       data,
     });
 
-    // Instantly refresh the Users table UI
     revalidatePath("/admin/users");
-    
     return { success: "User updated successfully." };
   } catch (error) {
     console.error("Update User Error:", error);

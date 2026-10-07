@@ -19,13 +19,18 @@ type UserType = {
   status: UserStatus;
 };
 
-export function UserTable({ initialUsers }: { initialUsers: UserType[] }) {
+export function UserTable({ 
+  initialUsers, 
+  currentUserId 
+}: { 
+  initialUsers: UserType[];
+  currentUserId: string;
+}) {
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [modalType, setModalType] = useState<"EDIT" | "DELETE" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form states for Editing
   const [editRole, setEditRole] = useState<Role>(Role.EDITOR);
   const [editStatus, setEditStatus] = useState<UserStatus>(UserStatus.PENDING);
 
@@ -76,21 +81,28 @@ export function UserTable({ initialUsers }: { initialUsers: UserType[] }) {
 
   return (
     <>
-      {/* RESPONSIVE CONTAINER: Cards on Mobile, Table on md+ */}
       <div className="bg-white dark:bg-slate-950 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl">
         
-        {/* MOBILE VIEW (Card Layout) */}
+        {/* MOBILE VIEW */}
         <div className="md:hidden grid grid-cols-1 divide-y divide-slate-100 dark:divide-slate-800">
           {initialUsers.map((user) => (
             <div key={user.id} className="space-y-3 p-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-white">{user.name}</p>
+                  <p className="font-medium text-slate-900 dark:text-white">
+                    {user.name} {user.id === currentUserId && "(You)"}
+                  </p>
                   <p className="text-slate-500 text-sm">{user.email}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => openEdit(user)} className="text-blue-600 text-sm hover:underline">Edit</button>
-                  <button onClick={() => openDelete(user)} className="text-red-600 text-sm hover:underline">Delete</button>
+                  {user.id !== currentUserId ? (
+                    <>
+                      <button onClick={() => openEdit(user)} className="text-blue-600 text-sm hover:underline">Edit</button>
+                      <button onClick={() => openDelete(user)} className="text-red-600 text-sm hover:underline">Delete</button>
+                    </>
+                  ) : (
+                    <span className="text-slate-400 text-xs italic">Current Session</span>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2 font-semibold text-xs">
@@ -108,7 +120,7 @@ export function UserTable({ initialUsers }: { initialUsers: UserType[] }) {
           ))}
         </div>
 
-        {/* DESKTOP VIEW (Table Layout) */}
+        {/* DESKTOP VIEW */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-slate-600 dark:text-slate-400 text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 border-b font-semibold text-slate-500 text-xs uppercase">
@@ -123,7 +135,9 @@ export function UserTable({ initialUsers }: { initialUsers: UserType[] }) {
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {initialUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                  <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">{user.name}</td>
+                  <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
+                    {user.name} {user.id === currentUserId && <span className="bg-slate-100 dark:bg-slate-800 ml-2 px-2 py-0.5 rounded text-[10px] text-slate-500 uppercase">You</span>}
+                  </td>
                   <td className="px-6 py-4">{user.email}</td>
                   <td className="px-6 py-4">
                     <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded font-semibold text-slate-600 dark:text-slate-300 text-xs">
@@ -139,10 +153,14 @@ export function UserTable({ initialUsers }: { initialUsers: UserType[] }) {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-3">
-                      <button onClick={() => openEdit(user)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                      <button onClick={() => openDelete(user)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                    </div>
+                    {user.id !== currentUserId ? (
+                      <div className="flex justify-end gap-3">
+                        <button onClick={() => openEdit(user)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                        <button onClick={() => openDelete(user)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 text-xs italic">Current Session</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -151,7 +169,7 @@ export function UserTable({ initialUsers }: { initialUsers: UserType[] }) {
         </div>
       </div>
 
-      {/* MODAL BACKDROP & CONTAINERS */}
+      {/* MODAL BACKDROP & CONTAINERS (Unchanged) */}
       {modalType && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-slate-900/50 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-slate-900 shadow-xl p-6 rounded-xl w-full max-w-md">
