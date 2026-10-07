@@ -1,43 +1,45 @@
 // File: page.tsx
 // Folder: src/app/admin/settings
-// Description: Placeholder page for system-wide configuration and site metadata.
-// Imports: None
-// Exports: Default SettingsPage component
+// Description: Server Component that fetches the current user's profile and renders the Settings page.
+// Imports: auth server hook, getUserAction, SettingsForm client component.
+// Exports: Default SettingsPage component.
 
-export default function SettingsPage() {
+import { auth } from "@/auth";
+import { getUserAction } from "@/modules/users/getuser.action";
+import { redirect } from "next/navigation";
+import { SettingsForm } from "@/modules/settings/components/SettingsForm";
+
+export default async function SettingsPage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  // Fetch fresh user data from the DB to ensure we have the latest name/email
+  const { user, error } = await getUserAction(session.user.id);
+
+  if (error || !user) {
+    return (
+      <div className="p-6 text-red-500">
+        <p>Error loading profile data: {error}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 p-6">
-      <div>
-        <h1 className="font-bold text-slate-900 dark:text-white text-2xl">Settings</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">Configure your global application preferences.</p>
+    <div className="mx-auto p-4 md:p-6 max-w-4xl">
+      <div className="mb-6">
+        <h1 className="font-bold text-slate-900 dark:text-white text-2xl">Account Settings</h1>
+        <p className="mt-1 text-slate-500 dark:text-slate-400 text-sm">
+          Update your personal information and secure your account.
+        </p>
       </div>
 
-      <div className="bg-white dark:bg-slate-950 shadow-sm p-6 border border-slate-200 dark:border-slate-800 rounded-xl">
-        <h2 className="mb-4 font-semibold text-slate-900 dark:text-white text-lg">General Settings</h2>
-        <div className="space-y-4 max-w-md">
-          <div>
-            <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">Site Name</label>
-            <input 
-              type="text" 
-              disabled 
-              placeholder="CyLoad CMS" 
-              className="bg-slate-50 dark:bg-slate-900 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full text-slate-500 text-sm" 
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">Contact Email</label>
-            <input 
-              type="email" 
-              disabled 
-              placeholder="admin@example.com" 
-              className="bg-slate-50 dark:bg-slate-900 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full text-slate-500 text-sm" 
-            />
-          </div>
-          <button disabled className="bg-blue-600 opacity-50 mt-2 px-4 py-2 rounded-lg font-semibold text-white text-sm">
-            Save Changes
-          </button>
-        </div>
-      </div>
+      <SettingsForm 
+        initialName={user.name || ""} 
+        initialEmail={user.email || ""} 
+      />
     </div>
   );
 }
