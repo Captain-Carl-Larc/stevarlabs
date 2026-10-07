@@ -2,13 +2,14 @@
 
 // File: setup.action.ts
 // Folder: src/modules/auth
-// Description: Server action to securely bootstrap the first Superadmin account with atomic email confirmation.
-// Imports: Prisma db client, Auth roles/status, bcrypt, Resend SDK.
+// Description: Server action to bootstrap the first Superadmin account, enforcing strict email verification.
+// Imports: Prisma db client, Auth roles/status, bcrypt, crypto, Resend SDK.
 // Exports: bootstrapSuperadmin
 
 import { db } from "@/lib/db";
 import { Role, UserStatus } from "@/generated/prisma";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -19,7 +20,6 @@ export async function bootstrapSuperadmin(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  // 1. Verify the environment token
   const envToken = process.env.SETUP_TOKEN;
   if (!envToken) {
     return { error: "SETUP_TOKEN is not configured in the server environment." };
@@ -33,26 +33,35 @@ export async function bootstrapSuperadmin(formData: FormData) {
   try {
     const passwordHash = await bcrypt.hash(password, 12);
     
-    // 2. Transaction prevents race conditions if two people submit exactly at once
+    // Generate secure verification token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+
     const user = await db.$transaction(async (tx) => {
       const userCount = await tx.user.count();
-      
-      // If any user exists, abort immediately
-      if (userCount > 0) {
-        return null;
-      }
+      if (userCount > 0) return null;
 
-      // Create the superadmin
-      return await tx.user.create({
+      const newUser = await tx.user.create({
         data: {
           name,
           email,
           passwordHash,
           role: Role.SUPERADMIN,
-          status: UserStatus.ACTIVE, // Superadmin is immediately active
-          emailVerifiedAt: new Date(),
+          status: UserStatus.PENDING, // Strictly PENDING until verified
+          // emailVerifiedAt is intentionally left null
         },
       });
+
+      await tx.inviteToken.create({
+        data: {
+          userId: newUser.id,
+          tokenHash: hashedToken,
+          expiresAt,
+        },
+      });
+
+      return newUser;
     });
 
     if (!user) {
@@ -61,44 +70,38 @@ export async function bootstrapSuperadmin(formData: FormData) {
 
     createdUserId = user.id;
 
-    // 3. Attempt to send the Welcome/Verification email via Resend
-    const loginLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login`;
+    const verifyLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verify-email?token=${rawToken}&email=${email}`;
 
     const { error: resendError } = await resend.emails.send({
       from: "CyLoad Core <onboarding@resend.dev>",
       to: email,
-      subject: "Welcome to CyLoad CMS - Superadmin Created",
+      subject: "Action Required: Verify Your Superadmin Account",
       html: `
         <p>Hello ${name},</p>
-        <p>Your Superadmin account for <strong>CyLoad CMS</strong> has been successfully verified and created.</p>
-        <p>You can now log in and begin configuring your system:</p>
+        <p>Your Superadmin account for <strong>CyLoad CMS</strong> has been initialized.</p>
+        <p>Before you can log in, you must verify this email address by clicking the link below:</p>
         <br/>
-        <a href="${loginLink}" style="padding: 10px 16px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Log In to Dashboard</a>
+        <a href="${verifyLink}" style="padding: 10px 16px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Verify Email & Activate Account</a>
         <br/><br/>
-        <p>If you did not authorize this setup, please check your server environment variables immediately.</p>
+        <p>This link will expire in 24 hours. If you did not authorize this setup, please check your server environment variables immediately.</p>
       `,
     });
 
-    // Throw if Resend API blocks the email (e.g., sending to unverified email in sandbox)
-    if (resendError) {
-      throw new Error(resendError.message);
-    }
+    if (resendError) throw new Error(resendError.message);
 
     return { success: true };
 
   } catch (error: any) {
     console.error("Bootstrap Error:", error);
 
-    // 4. COMPENSATING TRANSACTION: Rollback so the setup route isn't permanently locked out
     if (createdUserId) {
       try {
         await db.user.delete({ where: { id: createdUserId } });
-        console.log(`Rolled back superadmin creation for ${email} due to email failure.`);
       } catch (rollbackErr) {
-        console.error("CRITICAL: Failed to rollback superadmin after email failure", rollbackErr);
+        console.error("CRITICAL: Failed to rollback superadmin", rollbackErr);
       }
     }
 
-    return { error: `Setup failed to dispatch email: ${error.message}. Database changes reversed so you can try again.` };
+    return { error: `Setup failed to dispatch email: ${error.message}. Database changes reversed.` };
   }
 }

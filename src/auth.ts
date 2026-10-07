@@ -1,6 +1,6 @@
 // File: auth.ts
 // Folder: src
-// Description: Core NextAuth configuration enforcing status checks and secure session handling.
+// Description: Core NextAuth configuration enforcing strict email verification and status checks.
 // Imports: NextAuth, Credentials provider, Prisma DB, bcrypt, UserStatus.
 // Exports: handlers, signIn, signOut, auth
 
@@ -34,7 +34,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid email or password.");
         }
 
-        // Enforce ACTIVE status using the correct Prisma enums
+        // STRICT CHECK 1: Ensure email is verified
+        if (!user.emailVerifiedAt) {
+          throw new Error("Your email address has not been verified yet. Please check your inbox.");
+        }
+
+        // STRICT CHECK 2: Ensure account is ACTIVE
         if (user.status !== UserStatus.ACTIVE) {
           if (user.status === UserStatus.PENDING) {
             throw new Error("Account pending. Please check your email to activate.");
@@ -54,7 +59,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid email or password.");
         }
 
-        // Return all required fields, including status, to satisfy next-auth.d.ts
         return {
           id: user.id,
           name: user.name,
@@ -70,7 +74,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.role = user.role;
         token.id = user.id;
-        token.status = user.status; // Pass status to token
+        token.status = user.status;
       }
       return token;
     },
@@ -78,7 +82,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token && session.user) {
         session.user.role = token.role as Role;
         session.user.id = token.id as string;
-        session.user.status = token.status as UserStatus; // Pass status to session
+        session.user.status = token.status as UserStatus;
       }
       return session;
     },
