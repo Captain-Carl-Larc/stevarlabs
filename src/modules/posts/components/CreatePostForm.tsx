@@ -2,13 +2,15 @@
 
 // File: CreatePostForm.tsx
 // Folder: src/app/admin/posts/components
-// Description: Client form managing post creation state and the Tiptap editor.
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPostAction } from "@/modules/posts/create-post.action";
-import { RichTextEditor } from "@/modules/editor/components/RichTextEditor";
 import { PostStatus } from "@/generated/prisma";
+import { RichTextEditor } from "@/modules/editor/components/RichTextEditor";
+import { PostBasicDetails } from "./PostBasicDetails";
+import { PostSeoDetails } from "./PostSeoDetails";
+import { FeaturedImageUpload } from "./FeaturedImageUpload";
 
 type Category = { id: string; name: string };
 
@@ -22,34 +24,23 @@ export function CreatePostForm({ categories }: { categories: Category[] }) {
   const [slug, setSlug] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState<PostStatus>(PostStatus.DRAFT);
-  const [content, setContent] = useState<any>(null); // Tiptap JSON
-  
-  // SEO State
+  const [content, setContent] = useState<any>(null); 
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
+  
+  // Image State
+  const [featuredImage, setFeaturedImage] = useState("");
+  const [imageAltText, setImageAltText] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!categoryId) {
-      setError("Please select a category.");
-      return;
-    }
-    if (!content || !content.content || content.content.length === 0) {
-      setError("Post content cannot be empty.");
-      return;
-    }
+    if (!categoryId) return setError("Please select a category.");
+    if (!content || !content.content || content.content.length === 0) return setError("Post content cannot be empty.");
 
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
 
     const res = await createPostAction({
-      title,
-      slug,
-      categoryId,
-      content,
-      status,
-      metaTitle,
-      metaDescription,
+      title, slug, categoryId, content, status, metaTitle, metaDescription, featuredImage, imageAltText
     });
 
     if (res?.error) {
@@ -62,92 +53,53 @@ export function CreatePostForm({ categories }: { categories: Category[] }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-20">
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 p-4 border border-red-100 dark:border-red-900/50 rounded-lg text-red-600 dark:text-red-400 text-sm">
           {error}
         </div>
       )}
 
-      {/* Top Meta Data Grid */}
-      <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
-        <div className="space-y-4 bg-white dark:bg-slate-950 shadow-sm p-5 border border-slate-200 dark:border-slate-800 rounded-xl">
-          <div>
-            <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">Post Title *</label>
-            <input 
-              type="text" required value={title} onChange={(e) => setTitle(e.target.value)}
-              className="bg-transparent px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full dark:text-white text-sm"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">URL Slug (Optional)</label>
-            <input 
-              type="text" value={slug} onChange={(e) => setSlug(e.target.value)}
-              placeholder="Auto-generated if left blank"
-              className="bg-transparent px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full dark:text-white text-sm"
-            />
-          </div>
-          <div className="gap-4 grid grid-cols-2">
-            <div>
-              <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">Category *</label>
-              <select 
-                required value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-                className="bg-transparent px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full dark:text-white text-sm"
-              >
-                <option value="" disabled>Select category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">Status</label>
-              <select 
-                value={status} onChange={(e) => setStatus(e.target.value as PostStatus)}
-                className="bg-transparent px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full dark:text-white text-sm"
-              >
-                <option value={PostStatus.DRAFT}>Draft</option>
-                <option value={PostStatus.PUBLISHED}>Published</option>
-              </select>
-            </div>
-          </div>
+      {/* Grid Layout for Settings */}
+      <div className="items-start gap-6 grid grid-cols-1 lg:grid-cols-3">
+        
+        {/* Left Column (Main Details & SEO) */}
+        <div className="space-y-6 lg:col-span-2">
+          <PostBasicDetails 
+            title={title} setTitle={setTitle} 
+            categoryId={categoryId} setCategoryId={setCategoryId} 
+            status={status} setStatus={setStatus} 
+            categories={categories} 
+          />
+          <PostSeoDetails 
+            slug={slug} setSlug={setSlug} 
+            metaTitle={metaTitle} setMetaTitle={setMetaTitle} 
+            metaDescription={metaDescription} setMetaDescription={setMetaDescription} 
+          />
         </div>
 
-        {/* SEO Data */}
-        <div className="space-y-4 bg-white dark:bg-slate-950 shadow-sm p-5 border border-slate-200 dark:border-slate-800 rounded-xl">
-          <div>
-            <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">SEO Meta Title</label>
-            <input 
-              type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)}
-              placeholder="Keep under 60 characters"
-              className="bg-transparent px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full dark:text-white text-sm"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium text-slate-700 dark:text-slate-300 text-sm">SEO Meta Description</label>
-            <textarea 
-              value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)}
-              rows={4} placeholder="Keep under 160 characters"
-              className="bg-transparent px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg w-full dark:text-white text-sm"
-            />
-          </div>
+        {/* Right Column (Featured Image Sidebar) */}
+        <div className="space-y-6 lg:col-span-1">
+          <FeaturedImageUpload 
+            imageUrl={featuredImage} onImageChange={setFeaturedImage}
+            altText={imageAltText} onAltTextChange={setImageAltText}
+          />
         </div>
       </div>
 
-      {/* Tiptap Rich Text Editor */}
+      {/* Editor Spans Full Width */}
       <div>
         <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300 text-sm">Content *</label>
-        <RichTextEditor onChange={(json) => setContent(json)} />
+        <RichTextEditor onChange={setContent} />
       </div>
 
       {/* Sticky Bottom Action Bar */}
-      <div className="bottom-0 z-40 sticky flex justify-between items-center bg-white/90 dark:bg-slate-950/90 shadow-sm backdrop-blur p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
-        <p className="text-slate-500 text-sm">
-          Currently saving as: <strong className="text-slate-900 dark:text-white">{status}</strong>
+      <div className="right-0 bottom-0 left-0 lg:left-64 z-40 fixed flex justify-end items-center gap-4 bg-white/90 dark:bg-slate-950/90 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] backdrop-blur p-4 border-slate-200 dark:border-slate-800 border-t">
+        <p className="hidden sm:block text-slate-500 text-sm">
+          Saving as: <strong className="text-slate-900 dark:text-white">{status}</strong>
         </p>
         <button 
-          type="submit" 
-          disabled={loading}
+          type="submit" disabled={loading}
           className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 shadow-sm px-6 py-2.5 rounded-lg font-semibold text-white text-sm"
         >
           {loading ? "Saving Post..." : "Save Post"}
