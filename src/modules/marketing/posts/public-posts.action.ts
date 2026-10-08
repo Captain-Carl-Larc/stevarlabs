@@ -57,3 +57,22 @@ export async function getSidebarPosts(categoryId: string, currentPostId: string)
     return { posts: [] };
   }
 }
+
+//Get all public posts
+
+export async function getAllPublicPosts() {
+  try {
+    const posts = await db.post.findMany({
+      where: { status: PostStatus.PUBLISHED },
+      orderBy: { publishedAt: 'desc' },
+      include: { 
+        category: { select: { id: true, name: true, slug: true } },
+        author: { select: { name: true } }
+      },
+    });
+    return { posts };
+  } catch (error) {
+    console.error("Public All Posts Fetch Error:", error);
+    return { posts: [] };
+  }
+}
