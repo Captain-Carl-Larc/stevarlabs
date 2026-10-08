@@ -35,8 +35,9 @@ export async function getPresignedUrlAction(fileName: string, fileType: string) 
     const publicUrl = `${process.env.R2_PUBLIC_URL}/${uniqueKey}`;
 
     return { signedUrl, publicUrl };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Presigned URL Error:", error);
-    return { error: "Failed to generate upload URL." };
+    // Temporarily send the exact AWS error message to the frontend
+    return { error: `Failed: ${error.message || "Unknown AWS Error"}` };
   }
 }
