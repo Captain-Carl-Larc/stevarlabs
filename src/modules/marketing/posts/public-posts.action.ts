@@ -34,7 +34,10 @@ export async function getSidebarPosts(categoryId: string, currentPostId: string)
       },
       take: 3,
       orderBy: { publishedAt: 'desc' },
-      select: { id: true, title: true, slug: true, featuredImage: true, publishedAt: true }
+      select: { 
+        id: true, title: true, slug: true, featuredImage: true, publishedAt: true, 
+        author: { select: { name: true } } 
+      }
     });
 
     // 2. Fallback: If there aren't enough related posts, fill the gap with recent posts
@@ -46,7 +49,10 @@ export async function getSidebarPosts(categoryId: string, currentPostId: string)
         },
         take: 3 - sidebarPosts.length,
         orderBy: { publishedAt: 'desc' },
-        select: { id: true, title: true, slug: true, featuredImage: true, publishedAt: true }
+        select: { 
+          id: true, title: true, slug: true, featuredImage: true, publishedAt: true, 
+          author: { select: { name: true } } 
+        }
       });
       sidebarPosts = [...sidebarPosts, ...recentPosts];
     }
@@ -58,21 +64,57 @@ export async function getSidebarPosts(categoryId: string, currentPostId: string)
   }
 }
 
-//Get all public posts
-
-export async function getAllPublicPosts() {
+// Add this to fetch categories for the filter UI
+export async function getPublicCategories() {
   try {
-    const posts = await db.post.findMany({
-      where: { status: PostStatus.PUBLISHED },
-      orderBy: { publishedAt: 'desc' },
-      include: { 
-        category: { select: { id: true, name: true, slug: true } },
-        author: { select: { name: true } }
-      },
+    const categories = await db.category.findMany({
+      // Only fetch categories that actually have published posts
+      where: { posts: { some: { status: PostStatus.PUBLISHED } } },
+      select: { name: true, slug: true },
+      orderBy: { name: 'asc' }
     });
-    return { posts };
+    return { categories };
+  } catch (error) {
+    console.error("Public Categories Fetch Error:", error);
+    return { categories: [] };
+  }
+}
+
+// Upgraded to accept an optional categorySlug for filtering
+export async function getAllPublicPosts(page: number = 1, limit: number = 10, categorySlug?: string) {
+  try {
+    const skip = (page - 1) * limit;
+
+    // Build a dynamic where clause based on whether a category is selected
+    const whereCondition: any = { status: PostStatus.PUBLISHED };
+    if (categorySlug) {
+      whereCondition.category = { slug: categorySlug };
+    }
+
+    const [posts, total] = await db.$transaction([
+      db.post.findMany({
+        where: whereCondition,
+        skip,
+        take: limit,
+        orderBy: { publishedAt: 'desc' },
+        include: { 
+          category: { select: { id: true, name: true, slug: true } },
+          author: { select: { name: true } }
+        },
+      }),
+      db.post.count({
+        where: whereCondition 
+      })
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return { 
+      posts, 
+      metadata: { total, page, limit, totalPages } 
+    };
   } catch (error) {
     console.error("Public All Posts Fetch Error:", error);
-    return { posts: [] };
+    return { posts: [], metadata: null };
   }
 }
