@@ -4,9 +4,20 @@
 
 import { getCategoriesAction } from "@/modules/categories/get-categories.action";
 import { CategoryTable } from "@/modules/categories/components/CategoryTable";
+import { Pagination } from "@/components/ui/Pagination";
 
-export default async function CategoriesPage() {
-  const { categories, error } = await getCategoriesAction();
+export default async function CategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  // Extract and resolve the page number from the URL
+  const resolvedParams = await searchParams;
+  const currentPage = Number(resolvedParams?.page) || 1;
+  const limit = 10;
+
+  // Pass pagination arguments to the action
+  const { categories, metadata, error } = await getCategoriesAction(currentPage, limit);
 
   if (error || !categories) {
     return (
@@ -27,7 +38,14 @@ export default async function CategoriesPage() {
         </div>
       </div>
 
-      <CategoryTable initialCategories={categories} />
+      <div className="flex flex-col bg-white dark:bg-slate-950 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl">
+        <CategoryTable initialCategories={categories} />
+        
+        {/* Pagination rendered right below the client table component */}
+        {metadata && (
+          <Pagination totalPages={metadata.totalPages} currentPage={metadata.page} />
+        )}
+      </div>
     </div>
   );
 }
