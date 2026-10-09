@@ -8,6 +8,8 @@ import { getAllUsersAction } from "@/modules/users/getallusers.action";
 import { auth } from "@/auth";
 import { UserTable } from "@/modules/users/components/UserTable";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default async function UsersPage() {
   const session = await auth();
@@ -28,13 +30,23 @@ export default async function UsersPage() {
 
   return (
     <div className="mx-auto p-4 md:p-6 max-w-6xl">
-      <div className="flex justify-between items-center mb-6">
+      
+      {/* Mobile-Responsive Header */}
+      <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-4 mb-6">
         <div>
           <h1 className="font-bold text-slate-900 dark:text-white text-2xl">User Management</h1>
           <p className="mt-1 text-slate-500 dark:text-slate-400 text-sm">
             Manage team roles, statuses, and account access.
           </p>
         </div>
+        
+        {/* New User Button */}
+        <Link
+          href="/admin/users/create"
+          className="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-500 shadow-sm px-4 py-2.5 sm:py-2 rounded-lg w-full sm:w-auto font-semibold text-white text-sm transition-colors"
+        >
+          <Plus className="w-4 h-4" /> New User
+        </Link>
       </div>
 
       {/* Pass both the users list and the currently logged-in user's ID */}
