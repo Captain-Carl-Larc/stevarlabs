@@ -5,10 +5,21 @@
 import Link from "next/link";
 import { getPostsAction } from "@/modules/posts"; // Using the congregator!
 import { DeletePostButton } from "@/modules/posts/components/DeletePostButton";
+import { Pagination } from "@/components/ui/Pagination";
 import { Edit, Eye, Plus } from "lucide-react";
 
-export default async function PostsPage() {
-  const { posts, error } = await getPostsAction();
+export default async function PostsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  // Extract and resolve the page number from the URL
+  const resolvedParams = await searchParams;
+  const currentPage = Number(resolvedParams?.page) || 1;
+  const limit = 10;
+
+  // Pass the pagination arguments to the action and extract metadata
+  const { posts, metadata, error } = await getPostsAction(currentPage, limit);
 
   return (
     <div className="mx-auto p-4 md:p-6 max-w-7xl">
@@ -49,7 +60,7 @@ export default async function PostsPage() {
               {posts?.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-8 text-slate-500 text-center">
-                    No posts found. Create your first one!
+                    No posts found on this page.
                   </td>
                 </tr>
               )}
@@ -91,6 +102,11 @@ export default async function PostsPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination rendered at the bottom of the table wrapper */}
+        {metadata && (
+          <Pagination totalPages={metadata.totalPages} currentPage={metadata.page} />
+        )}
       </div>
     </div>
   );
