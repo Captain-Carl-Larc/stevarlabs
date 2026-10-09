@@ -1,14 +1,36 @@
-// Role: Admin Dashboard Placeholder
+// File: page.tsx
+// Folder: src/app/admin
+// Description: Admin dashboard page assembling modular components.
 
-export default function AdminDashboard() {
+import { getDashboardMetrics } from "@/modules/dashboard/dashboard.action";
+import { DashboardWelcomeBanner } from "@/modules/dashboard/components/DashboardWelcomeBanner";
+import { DashboardMetricsGrid } from "@/modules/dashboard/components/DashboardMetricsGrid";
+import { RecentPostsTable } from "@/modules/dashboard/components/RecentPostsTable";
+
+export default async function AdminDashboardPage() {
+  const { data, error } = await getDashboardMetrics();
+
+  if (error || !data) {
+    return (
+      <div className="p-6 text-red-600 dark:text-red-400">
+        <p>Error: {error || "Failed to load dashboard metrics."}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white dark:bg-slate-900 shadow-sm p-12 border border-slate-300 dark:border-slate-700 border-dashed rounded-xl text-center">
-      <h2 className="font-semibold text-slate-900 dark:text-white text-xl">
-        Dashboard Overview
-      </h2>
-      <p className="mt-2 text-slate-500 dark:text-slate-400 text-sm">
-        Your admin widgets and analytics will live here.
-      </p>
+    <div className="space-y-6 sm:space-y-8 mx-auto p-4 sm:p-6 max-w-7xl">
+      <DashboardWelcomeBanner userName={data.userName} />
+      
+      <DashboardMetricsGrid 
+        totalPosts={data.totalPosts}
+        publishedPosts={data.publishedPosts}
+        draftPosts={data.draftPosts}
+        totalCategories={data.totalCategories}
+        totalUsers={data.totalUsers}
+      />
+
+      <RecentPostsTable posts={data.recentPosts} />
     </div>
   );
 }
