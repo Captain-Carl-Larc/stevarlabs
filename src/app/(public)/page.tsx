@@ -1,18 +1,31 @@
 // File: page.tsx
-// Folder: src/app/(public)
-// Role: Public Landing Page
+// Route/Folder: src/app/(public)
+// Purpose: Main Homepage route. Orchestrates all the individual homepage sections into a single view.
+// Imports: Hero, Problem, Offer, Services, HowItWorks, ProofAndTerms, ResourcesTeaser, Faq, AuditCta
+// Used in: Root URL (/)
 
-import { BRAND } from "@/brand/brand.config";
+import Hero from "@/components/client/homepage/Hero";
+import Problem from "@/components/client/homepage/Problem";
+import Offer from "@/components/client/homepage/Offer";
+import Services from "@/components/client/homepage/Services";
+import HowItWorks from "@/components/client/homepage/HowItWorks";
+import ProofAndTerms from "@/components/client/homepage/ProofAndTerms";
+import ResourcesTeaser from "@/components/client/homepage/ResourcesTeaser";
+import Faq from "@/components/client/homepage/Faq";
+import AuditCta from "@/components/client/shared/AuditCta";
 
-export default function HomePage() {
+export default function Homepage() {
   return (
-    <div className="mx-auto px-6 py-24 max-w-7xl text-center">
-      <h1 className="font-extrabold text-slate-900 dark:text-white text-4xl sm:text-5xl tracking-tight">
-        Welcome to {BRAND.name}
-      </h1>
-      <p className="mx-auto mt-4 max-w-2xl text-slate-600 dark:text-slate-400 text-lg">
-        Your high-performance, SEO-first content management system.
-      </p>
-    </div>
+    <>
+      <Hero />
+      <Problem />
+      <Offer />
+      <Services />
+      <HowItWorks />
+      <ProofAndTerms />
+      <ResourcesTeaser />
+      <Faq />
+      <AuditCta />
+    </>
   );
 }
