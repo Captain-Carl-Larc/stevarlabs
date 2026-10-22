@@ -1,16 +1,37 @@
 // File: AuditFormBlock.tsx
 // Route/Folder: src/components/client/free-audit
-// Purpose: The primary conversion form with strict adherence to UK data rules (separate opt-in).
-// Imports: next/link
+// Purpose: The primary conversion form with a Suspense boundary to handle the success state safely.
+// Imports: next/link, useSearchParams, Suspense, CheckCircle2
 // Used in: src/app/(public)/free-audit/page.tsx
 
-import Link from "next/link";
+"use client";
 
-export default function AuditFormBlock() {
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { CheckCircle2 } from "lucide-react";
+
+function AuditFormInner() {
+  const searchParams = useSearchParams();
+  const isSuccess = searchParams.get("success") === "true";
+
+  if (isSuccess) {
+    return (
+      <div className="py-12 text-center animate-in duration-500 fade-in zoom-in">
+        <div className="flex justify-center items-center bg-green-100 dark:bg-green-900/30 mx-auto mb-6 rounded-full w-16 h-16">
+          <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-500" />
+        </div>
+        <h3 className="mb-4 font-bold text-slate-900 dark:text-white text-2xl">Request received</h3>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+          Thanks! We've received your details and will send your audit within [X] working days. Check your inbox for a confirmation.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="top-24 sticky bg-white dark:bg-slate-950 shadow-lg shadow-slate-200/50 dark:shadow-none p-8 border border-slate-200 dark:border-slate-800 rounded-2xl">
+    <>
       <h2 className="mb-6 font-bold text-slate-900 dark:text-white text-2xl">Request your audit</h2>
-      
       <form action="/api/audit" method="POST" className="space-y-5">
         <div>
           <label htmlFor="audit-name" className="block mb-1 font-medium text-slate-900 dark:text-white text-sm">Name</label>
@@ -33,7 +54,6 @@ export default function AuditFormBlock() {
           <input type="text" id="audit-town" name="town" className="bg-white dark:bg-slate-950 px-4 py-2.5 border border-slate-300 focus:border-blue-500 dark:border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 w-full text-slate-900 dark:text-white text-sm transition-colors" />
         </div>
 
-        {/* Spec Requirement 4.4: Separate, unticked marketing opt-in */}
         <div className="flex items-start gap-3 pt-2">
           <input type="checkbox" id="audit-marketing" name="marketing" className="dark:bg-slate-950 mt-1 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-600 w-4 h-4 text-blue-600" />
           <label htmlFor="audit-marketing" className="text-slate-600 dark:text-slate-400 text-sm">
@@ -50,6 +70,16 @@ export default function AuditFormBlock() {
           </p>
         </div>
       </form>
+    </>
+  );
+}
+
+export default function AuditFormBlock() {
+  return (
+    <div className="top-24 sticky bg-white dark:bg-slate-950 shadow-lg shadow-slate-200/50 dark:shadow-none p-8 border border-slate-200 dark:border-slate-800 rounded-2xl min-h-[600px]">
+      <Suspense fallback={<div className="bg-slate-100 dark:bg-slate-900 rounded-xl w-full h-full animate-pulse"></div>}>
+        <AuditFormInner />
+      </Suspense>
     </div>
   );
 }
