@@ -3,8 +3,8 @@
 // Role: Foundation - Single source of truth for client-specific branding
 
 export const BRAND = {
-  name: "CyLoad Core",
-  shortName: "CyLoad",
-  domain: "cyload.com",
-  supportEmail: "support@cyload.com",
+  name: "Stevarlabs",
+  shortName: "Stevarlabs",
+  domain: "stevarlabs.co.uk",
+  supportEmail: "support@stevarlabs.co.uk",
 } as const;
