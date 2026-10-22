@@ -64,7 +64,8 @@ export default function Header() {
             </div>
 
             <Link href="/resources" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Resources</Link>
-            <Link href="/blog" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Blog</Link>
+            {/* Updated from /blog to /posts */}
+            <Link href="/posts" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Posts</Link>
             <Link href="/about" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">About</Link>
             <Link href="/pricing" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Pricing</Link>
             <Link href="/contact" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Contact</Link>
@@ -101,7 +102,8 @@ export default function Header() {
           <div className="space-y-1 px-4 pt-2 pb-3">
             <Link href="/services" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-900 dark:text-white text-base" onClick={closeMenu}>Services</Link>
             <Link href="/resources" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Resources</Link>
-            <Link href="/blog" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Blog</Link>
+            {/* Updated from /blog to /posts */}
+            <Link href="/posts" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Posts</Link>
             <Link href="/about" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>About</Link>
             <Link href="/pricing" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Pricing</Link>
             <Link href="/contact" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Contact</Link>

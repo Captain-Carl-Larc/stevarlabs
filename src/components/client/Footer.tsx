@@ -48,7 +48,8 @@ export default function Footer() {
               <li><Link href="/about" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">About</Link></li>
               <li><Link href="/pricing" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Pricing</Link></li>
               <li><Link href="/resources" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Resources</Link></li>
-              <li><Link href="/blog" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Blog</Link></li>
+              {/* Updated from /blog to /posts */}
+              <li><Link href="/posts" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Posts</Link></li>
               <li><Link href="/contact" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Contact</Link></li>
             </ul>
           </div>
