@@ -1,7 +1,8 @@
 // File: layout.tsx
-// Folder: src/app
-// Role: Root Layout - Global HTML structure, system-based theming, and font loading
-// Imports: Geist fonts, Brand config, global CSS
+// Route/Folder: src/app
+// Purpose: Root HTML structure, global font loading, theming, and UK localization.
+// Imports: next/font/google (Geist), BRAND config, global CSS
+// Used in: Next.js root entry point (applies to all routes)
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -21,9 +22,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     template: `%s | ${BRAND.name}`,
-    default: BRAND.name,
+    default: "Dental Marketing Agency for UK Practices | Stevarlabs",
   },
-  description: `Content Management System for ${BRAND.name}`,
+  description: "Stevarlabs helps UK dental practices win more new-patient enquiries and keep existing patients. Local SEO, websites, social media and recall. Free audit.",
 };
 
 export default function RootLayout({
@@ -32,7 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}>
+    // Spec Rule: UK English everywhere
+    <html lang="en-GB" className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}>
       <body className="flex flex-col bg-slate-50 dark:bg-slate-950 min-h-full text-slate-900 dark:text-slate-100 transition-colors duration-200">
         {children}
       </body>
