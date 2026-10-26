@@ -20,11 +20,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Resolves relative OG/Twitter image URLs to the live domain
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://stevarlabs.co.uk"
+  ),
   title: {
     template: `%s | ${BRAND.name}`,
     default: "Dental Marketing Agency for UK Practices | Stevarlabs",
   },
-  description: "Stevarlabs helps UK dental practices win more new-patient enquiries and keep existing patients. Local SEO, websites, social media and recall. Free audit.",
+  description:
+    "Stevarlabs helps UK dental practices win more new-patient enquiries and keep existing patients. Local SEO, websites, social media and recall. Free audit.",
 };
 
 export default function RootLayout({
@@ -34,7 +39,10 @@ export default function RootLayout({
 }) {
   return (
     // Spec Rule: UK English everywhere
-    <html lang="en-GB" className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}>
+    <html
+      lang="en-GB"
+      className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
+    >
       <body className="flex flex-col bg-slate-50 dark:bg-slate-950 min-h-full text-slate-900 dark:text-slate-100 transition-colors duration-200">
         {children}
       </body>
