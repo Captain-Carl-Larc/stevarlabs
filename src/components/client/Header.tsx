@@ -27,10 +27,10 @@ export default function Header() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex justify-between items-center h-16">
           
-          {/* Logo */}
+          {/* Logo - Updated to pure text with blue dot */}
           <div className="flex-shrink-0">
-            <Link href="/" className="font-bold text-slate-900 dark:text-white text-xl tracking-tight" onClick={closeMenu}>
-              {BRAND.name}
+            <Link href="/" className="font-bold text-slate-900 dark:text-white text-2xl tracking-tight flex items-baseline" onClick={closeMenu}>
+              {BRAND.name}<span className="text-blue-600 dark:text-blue-500">.</span>
             </Link>
           </div>
 
@@ -64,7 +64,6 @@ export default function Header() {
             </div>
 
             <Link href="/resources" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Resources</Link>
-            {/* Updated from /blog to /posts */}
             <Link href="/posts" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Posts</Link>
             <Link href="/about" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">About</Link>
             <Link href="/pricing" className="font-medium text-slate-600 hover:text-slate-900 dark:hover:text-white dark:text-slate-300 text-sm transition-colors">Pricing</Link>
@@ -102,7 +101,6 @@ export default function Header() {
           <div className="space-y-1 px-4 pt-2 pb-3">
             <Link href="/services" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-900 dark:text-white text-base" onClick={closeMenu}>Services</Link>
             <Link href="/resources" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Resources</Link>
-            {/* Updated from /blog to /posts */}
             <Link href="/posts" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Posts</Link>
             <Link href="/about" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>About</Link>
             <Link href="/pricing" className="block hover:bg-slate-50 dark:hover:bg-slate-900 px-3 py-2 rounded-md font-medium text-slate-600 dark:text-slate-300 text-base" onClick={closeMenu}>Pricing</Link>
