@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     // 1. Send internal notification to the agency owner
     await resend.emails.send({
-      from: "Stevarlabs Leads <onboarding@resend.dev>", // Replace with your verified domain e.g., updates@fyutchalabs.tech
+      from: "Stevarlabs Leads <audit@mail.stevarlabs.co.uk>", // Replace with your verified domain e.g., updates@fyutchalabs.tech
       to: "hello@stevarlabs.co.uk", // The owner's email where leads should go
       subject: `New Audit Request: ${validatedData.practice}`,
       html: `
