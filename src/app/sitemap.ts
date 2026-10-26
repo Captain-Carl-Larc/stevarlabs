@@ -1,17 +1,20 @@
 // File: sitemap.ts
 // Route/Folder: src/app
-// Purpose: Automatically generates the sitemap.xml file for SEO indexing.
-// Imports: MetadataRoute from next
+// Purpose: Automatically generates sitemap.xml with static pages and published, indexable posts.
+// Imports: MetadataRoute from next, db, PostStatus
 // Used in: Root URL (/sitemap.xml)
 
 import { MetadataRoute } from "next";
+import { db } from "@/lib/db";
+import { PostStatus } from "@/generated/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  // Uses the environment variable you set up earlier, defaulting to localhost for dev
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+// Refresh hourly so new posts appear without a redeploy
+export const revalidate = 3600;
 
-  // Core navigation routes
-  const routes = [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stevarlabs.co.uk";
+
+  const staticRoutes = [
     "",
     "/services",
     "/services/local-seo",
@@ -27,13 +30,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact",
     "/privacy-policy",
     "/cookie-policy",
-    "/terms"
-  ];
+    "/terms",
+  ].map((route) => ({ url: `${baseUrl}${route}` }));
 
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route === "" || route === "/posts" ? "weekly" : "monthly",
-    priority: route === "" || route === "/free-audit" ? 1 : 0.8,
-  }));
+  let postRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await db.post.findMany({
+      where: {
+        status: PostStatus.PUBLISHED,
+        noIndex: false,
+      },
+      select: { slug: true, updatedAt: true },
+    });
+
+    postRoutes = posts.map((post) => ({
+      url: `${baseUrl}/posts/${post.slug}`,
+      lastModified: post.updatedAt,
+    }));
+  } catch (error) {
+    console.error("Sitemap Posts Fetch Error:", error);
+  }
+
+  return [...staticRoutes, ...postRoutes];
 }
