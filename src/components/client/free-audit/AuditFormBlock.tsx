@@ -1,12 +1,13 @@
 // File: AuditFormBlock.tsx
 // Route/Folder: src/components/client/free-audit
-// Purpose: The primary conversion form with a Suspense boundary to handle the success state safely.
-// Imports: next/link, useSearchParams, Suspense, CheckCircle2
+// Purpose: The primary conversion form with a Suspense boundary and native Calendly embed.
+// Imports: next/link, useSearchParams, Suspense, CheckCircle2, Script
 // Used in: src/app/(public)/free-audit/page.tsx
 
 "use client";
 
 import Link from "next/link";
+import Script from "next/script";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { CheckCircle2 } from "lucide-react";
@@ -17,14 +18,43 @@ function AuditFormInner() {
 
   if (isSuccess) {
     return (
-      <div className="py-12 text-center animate-in duration-500 fade-in zoom-in">
-        <div className="flex justify-center items-center bg-green-100 dark:bg-green-900/30 mx-auto mb-6 rounded-full w-16 h-16">
-          <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-500" />
+      <div className="flex flex-col h-full animate-in fade-in zoom-in duration-500 py-4">
+        
+        {/* Success Header */}
+        <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-4 px-2">
+          <div className="flex justify-center items-center bg-green-100 dark:bg-green-900/30 rounded-full w-12 h-12 shrink-0">
+            <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-500" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-bold text-slate-900 dark:text-white text-xl">Audit requested</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">We're reviewing your digital presence now.</p>
+          </div>
         </div>
-        <h3 className="mb-4 font-bold text-slate-900 dark:text-white text-2xl">Request received</h3>
-        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-          Thanks! We've received your details and will send your audit within [X] working days. Check your inbox for a confirmation.
-        </p>
+        
+        {/* Calendly Section */}
+        <div className="flex-1 flex flex-col pt-2">
+          <div className="text-center mb-4 px-2">
+            <h4 className="font-bold text-slate-900 dark:text-white text-lg mb-2">
+              Step 2: Book your 30-minute walkthrough
+            </h4>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
+              While we prepare your report, choose a time below to go over the findings.
+            </p>
+          </div>
+          
+          {/* Native Calendly Embed */}
+          <div 
+            className="calendly-inline-widget w-full h-[650px] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white" 
+            data-url="https://calendly.com/stephenmutwiiofficial/30min?hide_event_type_details=1&hide_gdpr_banner=1"
+          ></div>
+          
+          {/* Next.js safe script injection */}
+          <Script 
+            type="text/javascript" 
+            src="https://assets.calendly.com/assets/external/widget.js" 
+            strategy="lazyOnload"
+          />
+        </div>
       </div>
     );
   }
@@ -77,7 +107,7 @@ function AuditFormInner() {
 export default function AuditFormBlock() {
   return (
     <div className="top-24 sticky bg-white dark:bg-slate-950 shadow-lg shadow-slate-200/50 dark:shadow-none p-8 border border-slate-200 dark:border-slate-800 rounded-2xl min-h-[600px]">
-      <Suspense fallback={<div className="bg-slate-100 dark:bg-slate-900 rounded-xl w-full h-full animate-pulse"></div>}>
+      <Suspense fallback={<div className="bg-slate-100 dark:bg-slate-900 rounded-xl w-full h-[600px] animate-pulse"></div>}>
         <AuditFormInner />
       </Suspense>
     </div>
