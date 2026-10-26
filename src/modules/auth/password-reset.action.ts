@@ -40,7 +40,7 @@ export async function requestPasswordReset(formData: FormData) {
 
   try {
     await resend.emails.send({
-      from: "CyLoad Core <onboarding@resend.dev>", // Replace with your verified domain later (e.g., auth@fyutchalabs.com)
+      from: "CyLoad Core <noreply@mail.stevarlabs.co.uk>", // Replace with your verified domain later (e.g., auth@fyutchalabs.com)
       to: email,
       subject: "Reset your CyLoad Password",
       html: `

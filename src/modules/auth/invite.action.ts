@@ -69,7 +69,7 @@ export async function inviteUser(formData: FormData) {
     const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/accept-invite?token=${rawToken}&email=${email}`;
 
     const { error: resendError } = await resend.emails.send({
-      from: "CyLoad Core <onboarding@resend.dev>",
+      from: "CyLoad Core <noreply@mail.stevarlabs.co.uk>",
       to: email,
       subject: `You've been invited to Cyload as an ${role}`,
       html: `

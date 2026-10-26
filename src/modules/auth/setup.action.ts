@@ -73,7 +73,7 @@ export async function bootstrapSuperadmin(formData: FormData) {
     const verifyLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verify-email?token=${rawToken}&email=${email}`;
 
     const { error: resendError } = await resend.emails.send({
-      from: "CyLoad Core <onboarding@resend.dev>",
+      from: "CyLoad Core <noreply@mail.stevarlabs.co.uk>",
       to: email,
       subject: "Action Required: Verify Your Superadmin Account",
       html: `
