@@ -1,11 +1,12 @@
 // File: Footer.tsx
 // Route/Folder: src/components/client
 // Purpose: Global four-column footer containing legal links, service routing, and compliance text.
-// Imports: next/link, BRAND config
+// Imports: next/link, BRAND config, CookieSettingsButton
 // Used in: src/app/(public)/layout.tsx
 
 import Link from "next/link";
 import { BRAND } from "@/brand/brand.config";
+import CookieSettingsButton from "@/components/client/CookieSettingsButton";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -62,6 +63,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/privacy-policy" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Privacy policy</Link></li>
               <li><Link href="/cookie-policy" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Cookie policy</Link></li>
+              <li><CookieSettingsButton /></li>
               <li><Link href="/terms" className="text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 dark:text-slate-400 text-sm transition-colors">Website terms of use</Link></li>
             </ul>
           </div>
