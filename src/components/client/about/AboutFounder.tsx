@@ -1,8 +1,10 @@
 // File: AboutFounder.tsx
 // Route/Folder: src/components/client/about
 // Purpose: Founder bio integrating clinical background and explanation of the remote business model.
-// Imports: None
+// Imports: next/image
 // Used in: src/app/(public)/about/page.tsx
+
+import Image from "next/image";
 
 export default function AboutFounder() {
   return (
@@ -11,10 +13,13 @@ export default function AboutFounder() {
         
         <div className="items-center gap-10 grid md:grid-cols-[1fr_2fr] mb-16">
           <div className="relative bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl aspect-square overflow-hidden">
-            {/* Developer Note: Insert exact path to founder photo when ready */}
-            <div className="absolute inset-0 flex justify-center items-center font-medium text-slate-500 dark:text-slate-400">
-              [Founder Photo]
-            </div>
+            <Image
+              src="/founder-photo.png"
+              alt="Stephen Kalwenzi Mutwii, founder of Stevarlabs"
+              fill
+              sizes="(min-width: 768px) 33vw, 100vw"
+              className="object-cover"
+            />
           </div>
           <div>
             <h2 className="mb-2 font-bold text-slate-900 dark:text-white text-2xl">Who is behind Stevarlabs</h2>

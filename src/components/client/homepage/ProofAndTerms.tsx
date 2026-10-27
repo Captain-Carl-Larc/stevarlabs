@@ -49,7 +49,7 @@ export default function ProofAndTerms() {
             </li>
             <li className="flex items-start gap-3">
               <CheckCircle2 className="mt-0.5 w-5 h-5 text-blue-600 dark:text-blue-500 shrink-0" />
-              <span className="text-slate-600 dark:text-slate-400">[Month-to-month retainers, no long lock-in]</span>
+              <span className="text-slate-600 dark:text-slate-400">Month-to-month retainers, no long lock-in</span>
             </li>
             <li className="flex items-start gap-3">
               <CheckCircle2 className="mt-0.5 w-5 h-5 text-blue-600 dark:text-blue-500 shrink-0" />

@@ -9,7 +9,7 @@ export default function TermsContent() {
     <section className="bg-white dark:bg-slate-950 px-6 py-20 transition-colors duration-200">
       <div className="dark:prose-invert mx-auto max-w-3xl prose-headings:font-bold dark:prose-a:text-blue-400 prose-a:text-blue-600 prose prose-slate">
         <h1>Website Terms of Use</h1>
-        <p><strong>Last updated:</strong> [DATE]</p>
+        <p><strong>Last updated:</strong> 27/10/2026</p>
         
         <h2>1. Acceptance of terms</h2>
         <p>
@@ -43,7 +43,7 @@ export default function TermsContent() {
 
         <h2>7. Contact us</h2>
         <p>
-          If you have questions about these terms, contact us at <strong>[CONTACT EMAIL]</strong>.
+          If you have questions about these terms, contact us at <strong>audit@mail.stevarlabs.co.uk</strong>.
         </p>
       </div>
     </section>

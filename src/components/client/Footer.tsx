@@ -27,8 +27,8 @@ export default function Footer() {
               We help UK dental practices get more new-patient enquiries and keep the patients they already have.
             </p>
             <p className="font-medium text-slate-900 dark:text-slate-300 text-sm">
-              <a href="mailto:hello@stevarlabs.co.uk" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                [CONTACT EMAIL TO BE SUPPLIED]
+              <a href="mailto:audit@mail.stevarlabs.co.uk" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                audit@mail.stevarlabs.co.uk
               </a>
             </p>
           </div>

@@ -40,7 +40,7 @@ export default function Offer() {
           </ul>
           <div className="bg-slate-50 dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 rounded-lg">
             <p className="font-medium text-slate-900 dark:text-white">What you get:</p>
-            <p className="mt-1 text-slate-600 dark:text-slate-400">A short, plain-English report with prioritised fixes, delivered within [X] working days.</p>
+            <p className="mt-1 text-slate-600 dark:text-slate-400">A short, plain-English report with prioritised fixes, delivered within 3 working days.</p>
           </div>
         </div>
 

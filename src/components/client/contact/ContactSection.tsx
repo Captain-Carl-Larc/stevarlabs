@@ -86,8 +86,8 @@ export default function ContactSection() {
                   <Mail className="w-6 h-6 text-blue-600 dark:text-blue-500 shrink-0" />
                   <div>
                     <p className="mb-1 font-semibold text-slate-900 dark:text-white">Email</p>
-                    <a href="mailto:hello@stevarlabs.co.uk" className="hover:text-blue-600 transition-colors">
-                      [CONTACT EMAIL TO BE SUPPLIED]
+                    <a href="mailto:audit@stevarlabs.co.uk" className="hover:text-blue-600 transition-colors">
+                      audit@mail.stevarlabs.co.uk
                     </a>
                   </div>
                 </div>

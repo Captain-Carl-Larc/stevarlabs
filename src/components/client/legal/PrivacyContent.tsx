@@ -9,7 +9,7 @@ export default function PrivacyContent() {
     <section className="bg-white dark:bg-slate-950 px-6 py-20 transition-colors duration-200">
       <div className="dark:prose-invert mx-auto max-w-3xl prose-headings:font-bold dark:prose-a:text-blue-400 prose-a:text-blue-600 prose prose-slate">
         <h1>Privacy Policy</h1>
-        <p><strong>Last updated:</strong> [DATE]</p>
+        <p><strong>Last updated:</strong> 21/10/2026</p>
         
         <p>
           Stevarlabs ("we", "us", or "our") respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and share your data when you use our website or services.
@@ -17,7 +17,7 @@ export default function PrivacyContent() {
 
         <h2>1. Who is the controller?</h2>
         <p>
-          For the purposes of UK data protection law, [BUSINESS NAME / REGISTRATION NUMBER] is the data controller. If you have questions about this policy, please contact us at: <strong>[CONTACT EMAIL]</strong> or [BUSINESS ADDRESS].
+          For the purposes of UK data protection law, StevarLabs is the data controller. If you have questions about this policy, please contact us at: <strong>audit@mail.stevarlabs.co.uk</strong> 
         </p>
 
         <h2>2. What personal data we collect and why</h2>
@@ -30,7 +30,7 @@ export default function PrivacyContent() {
 
         <h2>3. Who we share your data with</h2>
         <p>
-          We do not sell your data. We share it only with trusted service providers necessary to operate our business, such as our hosting provider (Vercel), email routing provider (Resend), and analytics platforms.
+          We do not sell your data. We share it only with trusted service providers necessary to operate our business, such as our hosting provider (Netlify), email routing provider (Resend), and analytics platforms.
         </p>
 
         <h2>4. International transfers</h2>
@@ -40,7 +40,7 @@ export default function PrivacyContent() {
 
         <h2>5. Your rights under UK GDPR</h2>
         <p>
-          You have the right to access, correct, erase, restrict, or object to our processing of your data. You also have the right to withdraw consent at any time. To exercise these rights, email us at [CONTACT EMAIL].
+          You have the right to access, correct, erase, restrict, or object to our processing of your data. You also have the right to withdraw consent at any time. To exercise these rights, email us at audit@mail.stevarlabs.co.uk.
         </p>
         <p>
           If you are unhappy with how we handle your data, you have the right to complain to the Information Commissioner's Office (ICO).

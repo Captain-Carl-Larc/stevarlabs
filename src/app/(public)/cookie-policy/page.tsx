@@ -3,7 +3,7 @@ import CookieContent from "@/components/client/legal/CookieContent";
 
 export const metadata: Metadata = {
   title: "Cookie Policy | Stevarlabs",
-  description: "Cookie policy detailing how Stevarlabs uses cookies to improve your experience.",
+  description: "Stevarlabs does not currently use cookies or similar tracking technologies on this website.",
 };
 
 export default function CookiePolicyPage() {

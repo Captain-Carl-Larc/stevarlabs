@@ -29,8 +29,8 @@ export async function POST(request: Request) {
 
     // Send the message to the agency
     await resend.emails.send({
-      from: "Stevarlabs Contact <onboarding@resend.dev>", 
-      to: "hello@stevarlabs.co.uk", 
+      from: "Stevarlabs Contact <leads@mail.stevarlabs.co.uk>", 
+      to: "stephenmutwiiofficial@gmail.com", 
       subject: `New Contact Message from ${validatedData.name}`,
       html: `
         <h2>New Website Enquiry</h2>

@@ -8,6 +8,61 @@
 
 import { AlertCircle, Copy } from "lucide-react";
 
+type MessageType = "service" | "marketing";
+
+interface Template {
+  title: string;
+  type: MessageType;
+  message: string;
+}
+
+// Single source of truth: the text shown on the page is exactly the text that gets copied.
+const TEMPLATES: Template[] = [
+  {
+    title: "Check-up Recall (Due Now)",
+    type: "service",
+    message:
+      "Hi {first_name}, it's {team_member} at {practice_name}. Your check-up is due. It takes about 20 minutes, and it's the easiest way to catch small problems before they turn into painful (and pricey) ones. Reply YES and I'll send you the next available times, or book here: [Link]",
+  },
+  {
+    title: "Follow-up (No Reply After 3-5 Days)",
+    type: "service",
+    message:
+      "Hi {first_name}, {team_member} from {practice_name} again. Most people put their check-up off simply because life gets busy, so we've made it easy: book in 30 seconds here [Link], or reply with a day that suits you and I'll find you a slot.",
+  },
+  {
+    title: "Lapsed Patient (Overdue by 6+ months)",
+    type: "service",
+    message:
+      "Hi {first_name}, it's {team_member} at {practice_name}. It's been a little while since we last saw you, and I didn't want you to slip through the cracks. No judgement, whatever the reason. If anything's been bothering you, or you'd just like a proper check, reply here and I'll personally find you a time that works: [Link]",
+  },
+  {
+    title: "Final Nudge (Close the Loop)",
+    type: "service",
+    message:
+      "Hi {first_name}, I don't want to keep messaging you, so this is my last one. If you'd still like a check-up at {practice_name}, you can book here whenever you're ready: [Link]. If now isn't the right time, no problem at all. Just reply STOP and we'll leave you be. Look after yourself!",
+  },
+  {
+    title: "Review Request",
+    type: "marketing",
+    message:
+      "Hi {first_name}, thanks for coming in to {practice_name} on {appointment_date}. How did we do? If we looked after you well, a 30-second Google review would mean a lot to the team and helps other nervous patients choose with confidence: [Google Link]. And if anything wasn't right, reply here and I'll sort it personally.",
+  },
+];
+
+const BADGE_STYLES: Record<MessageType, { label: string; className: string }> = {
+  service: {
+    label: "Service message",
+    className:
+      "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
+  },
+  marketing: {
+    label: "Marketing message",
+    className:
+      "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
+  },
+};
+
 export default function ResourceContent() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -32,63 +87,35 @@ export default function ResourceContent() {
         Copy and paste these templates into your existing practice management software. Replace the bracketed fields like <code>{'{practice_name}'}</code> with your own merge tags.
       </p>
 
-      {/* Template 1 */}
-      <div className="mt-10 mb-8 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 px-6 py-4 border-slate-200 dark:border-slate-800 border-b">
-          <h3 className="m-0 font-bold text-slate-900 dark:text-white text-lg">Check-up Recall (Due Now)</h3>
-          <span className="inline-flex items-center bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded font-semibold text-slate-700 dark:text-slate-300 text-xs">Service message</span>
-        </div>
-        <div className="group relative bg-white dark:bg-slate-950 p-6">
-          <p className="m-0 font-mono text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
-            Hi {'{first_name}'}, it's time for your next dental check-up at {'{practice_name}'}. Keeping on top of these visits helps us spot any issues early. You can book your next visit online here: [Link] or call us on [Phone]. See you soon!
-          </p>
-          <button 
-            onClick={() => copyToClipboard("Hi {first_name}, it's time for your next dental check-up at {practice_name}. Keeping on top of these visits helps us spot any issues early. You can book your next visit online here: [Link] or call us on [Phone]. See you soon!")}
-            className="top-4 right-4 absolute bg-slate-100 dark:bg-slate-800 opacity-0 group-hover:opacity-100 p-2 rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-white transition-opacity"
-            title="Copy to clipboard"
-          >
-            <Copy className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      {TEMPLATES.map((template, index) => {
+        const badge = BADGE_STYLES[template.type];
 
-      {/* Template 2 */}
-      <div className="mb-8 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 px-6 py-4 border-slate-200 dark:border-slate-800 border-b">
-          <h3 className="m-0 font-bold text-slate-900 dark:text-white text-lg">Lapsed Patient (Overdue by 6+ months)</h3>
-          <span className="inline-flex items-center bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded font-semibold text-slate-700 dark:text-slate-300 text-xs">Service message</span>
-        </div>
-        <div className="group relative bg-white dark:bg-slate-950 p-6">
-          <p className="m-0 font-mono text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
-            Hi {'{first_name}'}, we noticed it's been a while since your last visit to {'{practice_name}'}. Your oral health is important to us. When you're ready, you can easily schedule your next check-up online: [Link]. We hope you are doing well!
-          </p>
-          <button 
-            onClick={() => copyToClipboard("Hi {first_name}, we noticed it's been a while since your last visit to {practice_name}. Your oral health is important to us. When you're ready, you can easily schedule your next check-up online: [Link]. We hope you are doing well!")}
-            className="top-4 right-4 absolute bg-slate-100 dark:bg-slate-800 opacity-0 group-hover:opacity-100 p-2 rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-white transition-opacity"
+        return (
+          <div
+            key={template.title}
+            className={`${index === 0 ? "mt-10 " : ""}mb-8 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden`}
           >
-            <Copy className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Template 3 */}
-      <div className="mb-8 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 px-6 py-4 border-slate-200 dark:border-slate-800 border-b">
-          <h3 className="m-0 font-bold text-slate-900 dark:text-white text-lg">Review Request</h3>
-          <span className="inline-flex items-center bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded font-semibold text-blue-700 dark:text-blue-400 text-xs">Marketing message</span>
-        </div>
-        <div className="group relative bg-white dark:bg-slate-950 p-6">
-          <p className="m-0 font-mono text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
-            Hi {'{first_name}'}, thanks for visiting {'{practice_name}'} on {'{appointment_date}'}. If you were happy with your care, we would be incredibly grateful if you left a quick Google review here: [Google Link]. It helps other patients find us. Thank you!
-          </p>
-          <button 
-            onClick={() => copyToClipboard("Hi {first_name}, thanks for visiting {practice_name} on {appointment_date}. If you were happy with your care, we would be incredibly grateful if you left a quick Google review here: [Google Link]. It helps other patients find us. Thank you!")}
-            className="top-4 right-4 absolute bg-slate-100 dark:bg-slate-800 opacity-0 group-hover:opacity-100 p-2 rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-white transition-opacity"
-          >
-            <Copy className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 px-6 py-4 border-slate-200 dark:border-slate-800 border-b">
+              <h3 className="m-0 font-bold text-slate-900 dark:text-white text-lg">{template.title}</h3>
+              <span className={`inline-flex items-center px-2 py-1 rounded font-semibold text-xs ${badge.className}`}>
+                {badge.label}
+              </span>
+            </div>
+            <div className="group relative bg-white dark:bg-slate-950 p-6">
+              <p className="m-0 font-mono text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
+                {template.message}
+              </p>
+              <button 
+                onClick={() => copyToClipboard(template.message)}
+                className="top-4 right-4 absolute bg-slate-100 dark:bg-slate-800 opacity-0 group-hover:opacity-100 p-2 rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-white transition-opacity"
+                title="Copy to clipboard"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        );
+      })}
 
     </div>
   );
