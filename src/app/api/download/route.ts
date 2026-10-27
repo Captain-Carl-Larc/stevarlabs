@@ -29,7 +29,7 @@ const RESOURCES: Record<
     slug: "recall-message-templates",
     title: "Dental Recall Message Pack",
     subject: "Your Dental Recall Message Pack - Stevarlabs",
-    fileName: "lead_resources/dental-recall-templates.pdf",
+    fileName: "dental-recall-templates.pdf",
   },
 };
 
