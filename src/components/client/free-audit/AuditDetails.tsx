@@ -35,7 +35,7 @@ export default function AuditDetails() {
       <div className="bg-slate-50 dark:bg-slate-900/50 p-6 border border-slate-200 dark:border-slate-800 rounded-xl">
         <h2 className="mb-2 font-bold text-slate-900 dark:text-white text-xl">What you get</h2>
         <p className="text-slate-600 dark:text-slate-400">
-          A short, plain-English report with prioritised fixes, delivered within [X] working days. You are under no obligation to hire us.
+          A short, plain-English report with prioritised fixes, delivered within 3 working days. You are under no obligation to hire us.
         </p>
       </div>
 
@@ -52,7 +52,7 @@ export default function AuditDetails() {
         <h2 className="mb-4 font-bold text-slate-900 dark:text-white text-lg">See a sample</h2>
         <Link href="/sample-audit.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center font-medium text-blue-600 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-400 transition-colors">
           <FileText className="mr-2 w-5 h-5" />
-          View an anonymised sample audit
+          View a sample audit
         </Link>
       </div>
     </div>
