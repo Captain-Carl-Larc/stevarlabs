@@ -1,85 +1,149 @@
-// File: ResourceDownloadForm.tsx
-// Route/Folder: src/components/client/resources/single
-// Purpose: Captures leads via PDF download, wrapped in Suspense to handle success state.
-// Imports: next/link, useSearchParams, Suspense, Download, CheckCircle2
-// Used in: src/app/(public)/resources/recall-message-templates/page.tsx
+// File: route.ts
+// Route/Folder: src/app/api/download
+// Purpose: Processes the resource download form, emails the requested asset to the lead,
+//          and notifies the owner of the new lead.
+// Imports: NextResponse, Resend, Zod
+//
+// Required env vars:
+//   RESEND_API_KEY   - your Resend API key
+//   R2_PUBLIC_URL    - public base URL of your R2 bucket, no trailing slash
+//                      e.g. https://pub-xxxx.r2.dev  or  https://files.stevarlabs.co.uk
 
-"use client";
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
+import { z } from "zod";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import { Download, CheckCircle2 } from "lucide-react";
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-function DownloadFormInner() {
-  const searchParams = useSearchParams();
-  const isSuccess = searchParams.get("success") === "true";
+const LEAD_NOTIFY_TO = "stephenmutwiiofficial@gmail.com";
+const LEAD_NOTIFY_FROM = "Stevarlabs Leads <leads@mail.stevarlabs.co.uk>";
+const RESOURCE_FROM = "Stevarlabs Resources <resources@mail.stevarlabs.co.uk>";
 
-  if (isSuccess) {
-    return (
-      <div className="py-12 text-center animate-in duration-500 fade-in zoom-in">
-        <div className="flex justify-center items-center bg-green-100 dark:bg-green-900/30 mx-auto mb-6 rounded-full w-16 h-16">
-          <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-500" />
-        </div>
-        <h3 className="mb-4 font-bold text-slate-900 dark:text-white text-2xl">Templates sent</h3>
-        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-          Success! We've emailed the full PDF pack to your inbox. You can close this page.
-        </p>
-      </div>
-    );
-  }
+// One entry per downloadable resource.
+// `slug` is the public page the user is sent back to after submitting the form.
+const RESOURCES: Record<
+  string,
+  { slug: string; title: string; subject: string; fileName: string }
+> = {
+  "recall-templates": {
+    slug: "recall-message-templates",
+    title: "Dental Recall Message Pack",
+    subject: "Your Dental Recall Message Pack - Stevarlabs",
+    fileName: "lead_resources/dental-recall-templates.pdf",
+  },
+};
 
-  return (
-    <>
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
-          <Download className="w-6 h-6 text-blue-600 dark:text-blue-500" />
-        </div>
-        <h2 className="m-0 font-bold text-slate-900 dark:text-white text-xl">Download as PDF/Docs</h2>
-      </div>
-      
-      <p className="mb-6 text-slate-600 dark:text-slate-400 text-sm">
-        Keep these templates on hand. Enter your email and we'll send the full pack directly to your inbox.
-      </p>
-      
-      <form action="/api/download" method="POST" className="space-y-5">
-        <input type="hidden" name="resource_id" value="recall-templates" />
-        
-        <div>
-          <label htmlFor="res-name" className="block mb-1 font-medium text-slate-900 dark:text-white text-sm">Name (optional)</label>
-          <input type="text" id="res-name" name="name" className="bg-white dark:bg-slate-950 px-4 py-2.5 border border-slate-300 focus:border-blue-500 dark:border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 w-full text-slate-900 dark:text-white text-sm transition-colors" />
-        </div>
-        <div>
-          <label htmlFor="res-email" className="block mb-1 font-medium text-slate-900 dark:text-white text-sm">Email</label>
-          <input type="email" id="res-email" name="email" required className="bg-white dark:bg-slate-950 px-4 py-2.5 border border-slate-300 focus:border-blue-500 dark:border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 w-full text-slate-900 dark:text-white text-sm transition-colors" />
-        </div>
+const downloadSchema = z.object({
+  resource_id: z.string().min(1),
+  name: z.string().trim().max(100).optional(),
+  email: z.string().trim().toLowerCase().email().max(254),
+  marketing: z.boolean().default(false),
+});
 
-        <div className="flex items-start gap-3 pt-2">
-          <input type="checkbox" id="res-marketing" name="marketing" className="dark:bg-slate-950 mt-1 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-600 w-4 h-4 text-blue-600" />
-          <label htmlFor="res-marketing" className="text-slate-600 dark:text-slate-400 text-sm leading-snug">
-            Send me occasional dental marketing tips by email. You can unsubscribe at any time.
-          </label>
-        </div>
-        
-        <div className="pt-2">
-          <button type="submit" className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 shadow-sm px-4 py-3 rounded-md w-full font-semibold text-white dark:text-slate-900 text-sm transition-colors">
-            Get the templates
-          </button>
-          <p className="mt-4 text-slate-500 dark:text-slate-500 text-xs text-center">
-            We use your details to send this download. See our <Link href="/privacy-policy" className="hover:text-slate-700 dark:hover:text-slate-300 underline">privacy policy</Link>.
-          </p>
-        </div>
-      </form>
-    </>
-  );
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
-export default function ResourceDownloadForm() {
-  return (
-    <div className="top-24 sticky bg-white dark:bg-slate-950 shadow-lg shadow-slate-200/50 dark:shadow-none p-8 border border-slate-200 dark:border-slate-800 rounded-2xl min-h-[450px]">
-      <Suspense fallback={<div className="bg-slate-100 dark:bg-slate-900 rounded-xl w-full h-full animate-pulse"></div>}>
-        <DownloadFormInner />
-      </Suspense>
-    </div>
-  );
+export async function POST(request: Request) {
+  try {
+    const formData = await request.formData();
+
+    const validatedData = downloadSchema.parse({
+      resource_id: formData.get("resource_id"),
+      name: formData.get("name") || undefined,
+      email: formData.get("email"),
+      marketing: formData.get("marketing") === "on",
+    });
+
+    const resource = RESOURCES[validatedData.resource_id];
+    if (!resource) {
+      throw new Error(`Unknown resource_id: ${validatedData.resource_id}`);
+    }
+
+    const baseUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, "");
+    if (!baseUrl) {
+      throw new Error("R2_PUBLIC_URL is not set");
+    }
+
+    const resourceLink = `${baseUrl}/${resource.fileName}`;
+    const displayName = validatedData.name ? escapeHtml(validatedData.name) : "there";
+    const submittedAt = new Date().toLocaleString("en-GB", {
+      timeZone: "Europe/London",
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+
+    // Send both emails at once. The lead's email and the owner notification are independent,
+    // so a failure in one never blocks the other.
+    const [leadResult, notifyResult] = await Promise.allSettled([
+      // 1. The resource, sent to the lead
+      resend.emails.send({
+        from: RESOURCE_FROM,
+        to: validatedData.email,
+        subject: resource.subject,
+        html: `
+          <p>Hi ${displayName},</p>
+          <p>Thanks for requesting the ${escapeHtml(resource.title)}.</p>
+          <p>You can view and download it using the link below:</p>
+          <p><a href="${resourceLink}"><strong>Download the pack (PDF)</strong></a></p>
+          <p>If you need any help setting these up in your practice management system, just hit reply.</p>
+          <p>Best regards,<br>Stevarlabs Team</p>
+        `,
+      }),
+
+      // 2. Lead notification, sent to the owner. Replying goes straight to the lead.
+      resend.emails.send({
+        from: LEAD_NOTIFY_FROM,
+        to: LEAD_NOTIFY_TO,
+        replyTo: validatedData.email,
+        subject: `New lead: ${validatedData.name || validatedData.email} (${resource.title})`,
+        html: `
+          <h2 style="margin:0 0 12px">New resource download</h2>
+          <table cellpadding="6" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px">
+            <tr><td><strong>Name</strong></td><td>${validatedData.name ? escapeHtml(validatedData.name) : "Not given"}</td></tr>
+            <tr><td><strong>Email</strong></td><td><a href="mailto:${escapeHtml(validatedData.email)}">${escapeHtml(validatedData.email)}</a></td></tr>
+            <tr><td><strong>Resource</strong></td><td>${escapeHtml(resource.title)}</td></tr>
+            <tr><td><strong>Marketing consent</strong></td><td>${validatedData.marketing ? "Yes, opted in" : "No, download only"}</td></tr>
+            <tr><td><strong>Submitted</strong></td><td>${submittedAt} (UK time)</td></tr>
+          </table>
+          <p style="font-family:Arial,sans-serif;font-size:13px;color:#555">
+            Hit reply to email this lead directly.
+            ${validatedData.marketing ? "" : "They did not opt in to marketing, so only follow up about the download itself."}
+          </p>
+        `,
+      }),
+    ]);
+
+    // Resend resolves with { data, error } rather than throwing, so check both layers.
+    if (notifyResult.status === "rejected" || notifyResult.value.error) {
+      const reason =
+        notifyResult.status === "rejected" ? notifyResult.reason : notifyResult.value.error;
+      console.error("Lead notification failed:", reason);
+    }
+
+    if (leadResult.status === "rejected" || leadResult.value.error) {
+      const reason = leadResult.status === "rejected" ? leadResult.reason : leadResult.value.error;
+      throw new Error(`Resource email failed: ${JSON.stringify(reason)}`);
+    }
+
+    // 3. Add to database / mailing list if marketing is true
+    if (validatedData.marketing) {
+      // In the future, write to Prisma DB or sync directly to an email tool like Mailchimp/Resend Audiences
+      console.log(`User ${validatedData.email} opted into marketing emails.`);
+    }
+
+    // Redirect back to the resource page
+    return NextResponse.redirect(
+      new URL(`/resources/${resource.slug}?success=true`, request.url),
+      303
+    );
+  } catch (error) {
+    console.error("Download Form Error:", error);
+    return NextResponse.redirect(new URL("/resources?error=true", request.url), 303);
+  }
 }

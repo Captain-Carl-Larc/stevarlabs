@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const resourceLink = "https://your-r2-public-url.com/dental-recall-templates.pdf"; 
 
     await resend.emails.send({
-      from: "Stevarlabs Resources <onboarding@resend.dev>",
+      from: "Stevarlabs Resources <resources@mail.stevarlabs.co.uk>",
       to: validatedData.email,
       subject: "Your Dental Recall Templates - Stevarlabs",
       html: `
