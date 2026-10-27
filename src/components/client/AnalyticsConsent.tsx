@@ -56,7 +56,7 @@ export default function AnalyticsConsent() {
           <div className="flex gap-2 mt-3">
             <button
               onClick={() => choose("denied")}
-              className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm"
+              className="bg-slate-900 dark:bg-white px-4 py-2 rounded-lg text-white dark:text-slate-900 text-sm"
             >
               Reject
             </button>
