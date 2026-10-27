@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
     // 2. Send confirmation to the practice owner (Optional but good for UX)
     await resend.emails.send({
-      from: "Stevarlabs <onboarding@resend.dev>", // Replace with your verified domain
+      from: "Stevarlabs <audit@mail.stevarlabs.co.uk>", // Replace with your verified domain
       to: validatedData.email,
       subject: "We've received your audit request - Stevarlabs",
       html: `
